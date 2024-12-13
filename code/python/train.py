@@ -4,6 +4,15 @@ import tensorflow as tf
 import keras
 from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import cosine_similarity
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+
+wav_path = r"../../model/wav_0/流行 a.wav"
+wav_path1 = r"../../model/wav_0/流行 e.wav"
+wav_path2 = r"../../model/wav_0/流行 i.wav"
+wav_path3 = r"../../model/wav_0/流行 o.wav"
+wav_path4 = r"../../model/wav_0/流行 u.wav"
 
 
 # 提取特征
@@ -13,7 +22,7 @@ def extract_feature(file_path):
     return np.mean(mfccs.T,axis=0)
 
 
-audio_features = ["../profile/wav_0/流行a.wav","../profile/wav_0/流行e.wav","../profile/wav_0/流行i.wav","../profile/wav_0/流行o.wav","../profile/wav_0/流行u.wav"]
+audio_features = [wav_path,wav_path1,wav_path2,wav_path3,wav_path4]
 labels = [0,1,2,3,4]
 
 features = np.array([extract_feature(file) for file in audio_features])
@@ -25,14 +34,10 @@ recongnition_model = keras.Sequential([
     keras.layers.Dense(5,activation="softmax")
 ])
 
-recongnition_model.compile(optimizer=keras.optimizers.Adam,loss=keras.losses.sparse_categorical_crossentropy,metrics=[
-        keras.metrics.BinaryAccuracy(),
-        keras.metrics.FalseNegatives(),
-    ],
-)
+recongnition_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 x_train,x_test,y_train,y_test = train_test_split(features,labels,test_size=0.2,random_state=42)
-recongnition_model.fit(x_train,y_train,epochs=50,batch_size=16,validation_data=(x_test, y_test))
+recongnition_model.fit(x_train,y_train,epochs=100,batch_size=16,validation_data=(x_test, y_test))
 
 def match_audio(file_path):
     feature = extract_feature(file_path)
@@ -55,3 +60,9 @@ def recongnition_match_audio(test_file_path):
     similarity = cosine_similarity([test_feature], [standard_feature])
     print(f'Cosine similarity: {similarity[0][0]}')
 
+
+converter = tf.lite.TFLiteConverter.from_keras_model(recongnition_model)
+tf_model = converter.convert()
+
+with open("../model/model.tflite","wb") as f:
+    f.write(tf_model)
