@@ -4,9 +4,6 @@
 ```
 Sound-Correction
 ├── AD_Folder/
-│   ├── lib/        // 库内容
-│   ├── ScHDOc/     // 原理图
-│   └── PCB/        // PCB文件
 ├── code/           // 代码
 │   ├── Block diagram/      // 框图
 │   ├── main_brach/         // C/c++主内容
