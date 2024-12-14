@@ -4,16 +4,16 @@ import tensorflow as tf
 import keras
 from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import cosine_similarity
-import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 
-wav_path = r"../../model/wav_0/流行 a.wav"
-wav_path1 = r"../../model/wav_0/流行 e.wav"
-wav_path2 = r"../../model/wav_0/流行 i.wav"
-wav_path3 = r"../../model/wav_0/流行 o.wav"
-wav_path4 = r"../../model/wav_0/流行 u.wav"
+wav_path = r"./../../profile/wav_0/流行 a.wav"
+wav_path1 = r"./../../profile/wav_0/流行 e.wav"
+wav_path2 = r"./../../profile/wav_0/流行 i.wav"
+wav_path3 = r"./../../profile/wav_0/流行 o.wav"
+wav_path4 = r"./../../profile/wav_0/流行 u.wav"
 
+
+test_path = r"./../../profile/test_wav/aaa.wav"
 
 # 提取特征
 def extract_feature(file_path):
@@ -37,7 +37,7 @@ recongnition_model = keras.Sequential([
 recongnition_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 x_train,x_test,y_train,y_test = train_test_split(features,labels,test_size=0.2,random_state=42)
-recongnition_model.fit(x_train,y_train,epochs=100,batch_size=16,validation_data=(x_test, y_test))
+recongnition_model.fit(x_train,y_train,epochs=1000,batch_size=16,validation_data=(x_test, y_test))
 
 def match_audio(file_path):
     feature = extract_feature(file_path)
@@ -66,3 +66,6 @@ tf_model = converter.convert()
 
 with open("../model/model.tflite","wb") as f:
     f.write(tf_model)
+
+
+recongnition_match_audio(test_path)
